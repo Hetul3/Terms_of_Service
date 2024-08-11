@@ -1,2 +1,4 @@
 venv
 Legal_Doc_Dataset
+.env
+vector_store
