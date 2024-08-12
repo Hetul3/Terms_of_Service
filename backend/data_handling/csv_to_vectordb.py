@@ -45,3 +45,6 @@ def create_vstore():
         return f"Vectordb successfully stored"
     else:
         return f"Failed to store vectordb"
+    
+if __name__ == '__main__':
+    

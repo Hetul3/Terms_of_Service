@@ -18,3 +18,5 @@ def combine_csv():
     combined_dfs.to_csv('../Legal_Doc_Dataset/dataset.csv', index=False)
     
     return "../Legal_Doc_Dataset/dataset.csv"
+
+if __name__ == '__main__':
