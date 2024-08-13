@@ -5,8 +5,8 @@ from collections import defaultdict
 import chromadb
 from chromadb.config import Settings
 from chromadb import Client
-from config import Config
-from preprocessing import combine_csv
+from app.config import Config
+from .preprocessing import combine_csv
 
 db_path = '../vector_store'
 collection_name = Config.COLLECTION_NAME
@@ -45,6 +45,3 @@ def create_vstore():
         return f"Vectordb successfully stored"
     else:
         return f"Failed to store vectordb"
-    
-if __name__ == '__main__':
-    

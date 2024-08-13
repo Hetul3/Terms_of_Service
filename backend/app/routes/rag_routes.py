@@ -1,6 +1,7 @@
-from flask import jsonify, current_app, requests, Response, json
+from flask import jsonify, current_app, Response, json, request
+import requests
 from . import rag_bp
-from app.RAG.llm import *
+from RAG.llm import *
 
 # query the LLM directly and save the query and results in db
 @rag_bp.route('/query_llm', methods=['POST'])

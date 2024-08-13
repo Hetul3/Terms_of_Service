@@ -1,6 +1,7 @@
-from flask import jsonify, current_app, requests, Response, json
+from flask import jsonify, current_app, Response, json, request
+import requests
 from . import vector_store_bp
-from app.data_handling.csv_to_vectordb import *
+from data_handling.csv_to_vectordb import *
 
 @vector_store_bp.route('/initialize_vstore', methods=['GET'])
 def create_vstore_route():
