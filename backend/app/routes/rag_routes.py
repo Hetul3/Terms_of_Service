@@ -1,5 +1,5 @@
 from flask import jsonify, current_app, Response, json, request
-from wekzeug.utils import secure_filename
+from werkzeug.utils import secure_filename
 import requests
 from . import rag_bp
 from RAG.llm import *
