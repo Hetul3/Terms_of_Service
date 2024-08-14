@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 import requests
 from . import rag_bp
 from RAG.llm import *
+from RAG.image_processing import *
 
 # query the LLM directly and save the query and results in db
 @rag_bp.route('/query_llm', methods=['POST'])
@@ -90,3 +91,20 @@ def process_url_contract():
         current_app.logger.error(f"Error processing text contract: {e}")
         response = Response(json.dumps({'error': "Unexpected error processing text contract"}), status=500, mimetype='application/json')
         return response
+    
+@rag_bp.route('/process_image_test', methods=['POST'])
+def process_image():
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': "No file part in the request"}), 400
+        
+        file = request.files['file']
+        
+        if file:
+            text = extract_image_text(file)
+            print(text)
+            return jsonify({'text': text}), 200
+    
+    except Exception as e:
+        current_app.logger.error(f"Error processing image: {e}")
+        return jsonify({'error': "Unexpected error processing image"}), 500

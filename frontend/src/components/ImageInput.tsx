@@ -17,13 +17,23 @@
         formData.append('file', file);
 
         try {
-            const response = await fetch('http://localhost:8080/rag/process_image_contract', {
+            const response = await fetch('http://localhost:8080/rag/process_image_test', {
                 method: 'POST',
                 body: formData
             });
-
-            const data = await response.json();
-            console.log(data);
+        
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+        
+            const contentType = response.headers.get("content-type");
+            if (contentType && contentType.indexOf("application/json") !== -1) {
+                const data = await response.json();
+                console.log("extracted text", data.text);
+            } else {
+                const text = await response.text();
+                console.log("extracted text", text);
+            }
         } catch(error) {
             console.error("Error uploading image", error);
         }
@@ -31,7 +41,7 @@
 
     return (
         <form onSubmit={handleSubmit}>
-            <input type="file" onChange={handleFileChange} accept=".pdf, .png, .jpg, .jpeg" />
+            <input type="file" onChange={handleFileChange} accept=".pdf, .png, .jpg, .jpeg" placeholder='Insert image' />
             <button type="submit">Upload</button>
         </form>
     )

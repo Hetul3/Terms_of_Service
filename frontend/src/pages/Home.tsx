@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import ImageInput from '../components/ImageInput';
 
 const Home: React.FC = () => {
     const [query, setQuery] = useState<string>("");
@@ -27,6 +28,7 @@ const Home: React.FC = () => {
         <div>
             <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
             <button onClick={() => runQuery(query)}>Run Query</button>
+            <ImageInput />
             <h1>{llmResponse}</h1>
         </div>
     )
