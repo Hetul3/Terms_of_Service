@@ -2,3 +2,4 @@ venv
 Legal_Doc_Dataset
 .env
 vector_store
+__pycache__

@@ -1,23 +1,33 @@
 import React from 'react';
+import { useState } from 'react';
 
 const Home: React.FC = () => {
-    const runQuery = () => {
-        let query: string = "Give me a logical fallacy";
+    const [query, setQuery] = useState<string>("");
+    const [llmResponse, setLlmResponse] = useState<string>("");
+
+    const runQuery = (query: string) => {
         fetch('http://localhost:8080/rag/query_llm', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ prompt: query })
-    })
-    .then(response => response.json())
-    .then(data => console.log(data))
-    .catch(error => console.log(error));
+        })
+        .then(response => response.json())
+        .then(
+            data => {
+                console.log(data);
+                setLlmResponse(data.response);
+            }
+        )
+        .catch(error => console.error(error));
     }
 
     return (
         <div>
-            <button onClick={runQuery}>Run Query</button>
+            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
+            <button onClick={() => runQuery(query)}>Run Query</button>
+            <h1>{llmResponse}</h1>
         </div>
     )
 }
