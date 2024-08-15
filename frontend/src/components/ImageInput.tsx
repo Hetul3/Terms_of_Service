@@ -1,4 +1,5 @@
  import React, { useState, ChangeEvent, FormEvent } from 'react';
+import {uploadImage} from '../api/api';
 
  const ImageInput: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
@@ -13,29 +14,11 @@
         event.preventDefault();
         if(!file) return;
 
-        const formData = new FormData();
-        formData.append('file', file);
-
         try {
-            const response = await fetch('http://localhost:8080/rag/process_image_test', {
-                method: 'POST',
-                body: formData
-            });
-        
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const contentType = response.headers.get("content-type");
-            if (contentType && contentType.indexOf("application/json") !== -1) {
-                const data = await response.json();
-                console.log("extracted text", data.text);
-            } else {
-                const text = await response.text();
-                console.log("extracted text", text);
-            }
+            const data = await uploadImage(file);
+            console.log("extracted text: ", data);
         } catch(error) {
-            console.error("Error uploading image", error);
+            console.error(error);
         }
     };
 

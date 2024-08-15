@@ -4,3 +4,4 @@ Legal_Doc_Dataset
 vector_store
 __pycache__
 model_storage
+.DS_Store

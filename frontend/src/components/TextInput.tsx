@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
+import {submitText} from '../api/api';
 
 const TextInput: React.FC = () => {
     const [text, setText] = useState<string>("");
 
-    const submitText = (text: string) => {
+    const handleSubmitText = (text: string) => {
         if(text === null || text === "") {
             alert("Please enter longer text");
             return;
         }
-        fetch('http://localhost:8080/rag/process_text_contract', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ text: text })
-        })
-        .then(response => response.json())
-        .catch(error => console.error(error))
+        submitText(text)
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => console.error(error));
     }
 
     return (
@@ -27,7 +24,7 @@ const TextInput: React.FC = () => {
             value={text}
             onChange={(e) => setText(e.target.value)}
             />
-            <button onClick={() => submitText(text)}>Run Query</button>
+            <button onClick={() => handleSubmitText(text)}>Run Query</button>
         </div>
         </>
     )
