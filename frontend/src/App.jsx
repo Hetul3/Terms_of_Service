@@ -11,7 +11,6 @@ function App() {
         <Route path="/" element={<HomePage />} />
       </Routes>
     </Router>
-    <h1>Testing</h1>
     </>
   )
 }

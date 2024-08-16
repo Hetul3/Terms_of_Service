@@ -1,37 +1,66 @@
-import React from 'react';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ImageInput from '../components/ImageInput';
+import TextInput from '../components/TextInput';
+import UrlInput from '../components/UrlInput';
+import ResponseOutput from '../components/ResponseOutput';
 
 const Home: React.FC = () => {
-    const [query, setQuery] = useState<string>("");
-    const [llmResponse, setLlmResponse] = useState<string>("");
+  const [headerVisible1, setHeaderVisible1] = useState(false);
+  const [headerVisible2, setHeaderVisible2] = useState(false);
+  const [description, setDescription] = useState("");
+  const fullDescription = "Select how you want to paste your terms and conditions. Our advanced AI-powered system will analyze the document for potential issues and inconsistencies!";
 
-    const runQuery = (query: string) => {
-        fetch('http://localhost:8080/rag/query_llm', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ prompt: query })
-        })
-        .then(response => response.json())
-        .then(
-            data => {
-                console.log(data);
-                setLlmResponse(data.response);
-            }
-        )
-        .catch(error => console.error(error));
-    }
+  useEffect(() => {
+    const headerTimeout1 = setTimeout(() => setHeaderVisible1(true), 500);
+    const headerTimeout2 = setTimeout(() => setHeaderVisible2(true), 1500);
+  
+    let charIndex = 0;
+    const typingTimeout = setTimeout(() => {
+      const typingInterval = setInterval(() => {
+        if (charIndex < fullDescription.length) {
+          setDescription(fullDescription.slice(0, charIndex + 1));
+          charIndex++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 25);
+      return () => clearInterval(typingInterval);
+    }, 2000); 
+  
+    return () => {
+      clearTimeout(headerTimeout1);
+      clearTimeout(headerTimeout2);
+      clearTimeout(typingTimeout);
+    };
+  }, []);
 
-    return (
-        <div>
-            <input type="text" value={query} onChange={(e) => setQuery(e.target.value)} />
-            <button onClick={() => runQuery(query)}>Run Query</button>
-            <ImageInput />
-            <h1>{llmResponse}</h1>
+  return (
+    <div className="min-h-screen bg-bone flex flex-col items-center justify-center font-sans">
+      <div className="w-3/4 max-w-3xl">
+        <h1 className="text-6xl font-bold mb-4">
+          <span className={`block transition-all duration-2000 ease-out ${
+            headerVisible1 ? "transform translate-y-0 opacity-100" : "transform -translate-y-20 opacity-0"
+          }`}>
+            Your Terms and
+          </span>
+          <span className={`block transition-all duration-2000 ease-out ${
+            headerVisible2 ? "transform translate-y-0 opacity-100" : "transform -translate-y-5 opacity-0"
+          }`}>
+            Conditions Checker!
+          </span>
+        </h1>
+        <div className="mt-4 text-xl text-gray-700" style={{ height: '75px', overflow: 'hidden' }}>
+          <p>{description}</p>
         </div>
-    )
+        <div className="mt-8">
+          <TextInput />
+          <UrlInput />
+          <ImageInput />
+          <ResponseOutput />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default Home;

@@ -1,3 +1,18 @@
+export async function queryLlm(query: string) {
+    const response = await fetch('http://localhost:8080/rag/query_llm', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ prompt: query })
+    })
+
+    if(!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+}
+
 export async function uploadImage(file: File) {
     const formData = new FormData();
     formData.append('file', file);
