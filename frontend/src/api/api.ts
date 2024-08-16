@@ -1,3 +1,5 @@
+const API_BASE_URL: string = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+
 export async function queryLlm(query: string) {
     const response = await fetch('http://localhost:8080/rag/query_llm', {
         method: 'POST',
