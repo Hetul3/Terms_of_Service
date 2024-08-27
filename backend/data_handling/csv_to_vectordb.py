@@ -15,7 +15,7 @@ def create_vstore():
     data_path = combine_csv()
     
     chroma_client = chromadb.PersistentClient(path=db_path)
-    collection = chroma_client.get_or_create_collection(name=collection_name)
+    collection = chroma_client.get_or_create_collection(name=collection_name, metadata={"hnsw:space": "cosine"})
     
     text_to_classifications = defaultdict(set)
     

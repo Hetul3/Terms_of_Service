@@ -1,25 +1,40 @@
-SYSTEM_PROMPT_EVALUATION = """
-You are an AI who is an expert in Terms of Services. 
-Evaluate the similiarity of the following texts in terms of 
-their meaning for Terms of Service. 
-Phrase 1: "{chunk}".
-Phrase 2: "{retrieved_data}".
-Phrase 2 also has a classification of "{classifications}". 
-Provide the similiarity that Phrase 1 would be the same classification as Phrase 2. 
-Only respond with the relationship between these texts in terms of their legal language used for Terms of Service. 
-Respond either "related", "semi-related", or "unrelated".
+SYSTEM_PROMPT_GENERATION = """
+You are an AI expert in Legal Terminology, specializing in Terms of Service contracts.
+
+Analyze the following chunk and its related document(s) and the documents' classification(s). 
+Chunk: "{chunk}"
+Related Docs and their Classifications: "{related_docs}"
+Briefly explain in under 25 tokens what the chunk text means to someone not proficient in legal terminology as how it related to the classifications.
+If the chunk is not a red flag, response only with "Introductory/Generic". 
+Output your response only as a json like this:
+{
+    "explanation": "<explanation>"
+}
+
+Do not return anything else
 """
 
-SYSTEM_PROMPT_GENERATION = """
-You are an AI expert in Terms of Services.
+SYSTEM_PROMPT_SPECIFICITY = """
+You are an AI expert in Legal Terminology, specializing in Terms of Service contracts.
 
-Chunk: "{chunk}"
+Analyze the following text: "{prompt_text}".
+Only return a specificity score between 0-1 (to 2 decimal places) about how specific this text is to legal terminology in a json like this:
+{
+    "specificity": <score>
+}
 
-Analyze the following related document(s) and its classification(s). 
-Briefly explain in under 25 tokens what the chunk text means to someone not proficient in legal terminology as how it relates to the classifications.
-If the chunk is not a redflag, respond only with "Introductory/Generic".
+Do not return anything else
+"""
 
-Document: "{document}"
-Classification: "{classification}"
-Relation: "{relation_score}"
+SYSTEM_PROMPT_SIMILIARITY = """
+You are an AI expert in Legal Terminology, specializing in Terms of Service contracts.
+Analyze the following texts and determine a similarity score between them in terms of what they mean in a legal context.
+Text 1: "{prompt_text}" 
+Text 2: "{retrieved_text}" 
+Only return a similarity score between 0-1 (to 2 decimal places) in a json like this:
+{
+    "similarity": <score>
+}
+
+Do not return anything else
 """
