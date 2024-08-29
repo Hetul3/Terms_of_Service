@@ -15,17 +15,24 @@ class CorrectiveRAG:
         
     def classify_prompt_text(self, prompt_text):
         classify_prompt = SYSTEM_PROMPT_SPECIFICITY.format(
-            prompt_text=prompt_text
+            prompt_text=prompt_text,
         )
-        response = query_llm(classify_prompt, max_tokens=10, temperature=0.0, model=self.reasoning_models[1])
-        try:
-            response_json = json.loads(response)
-            S = response_json.get("specificity", 0)
-        except json.JSONDecodeError:
-            S = 0
+        response = query_llm(classify_prompt, max_tokens=15, temperature=0.0, model=self.reasoning_models[1])
+        print("Raw LLM Response:", response)
         
-        threshold_score = 0.53 * (1 + (S / 10)) # Dynamic threshold based on empirical testing
-        return threshold_score
+        try:
+            response_json = json.loads(response.strip())
+            specificity_score = response_json.get("specificity", 0)
+            threshold_score = 0.53 * (1 + (specificity_score / 10)) # Dynamic threshold based on empirical testing
+            return threshold_score
+
+        except json.JSONDecodeError:
+            print("Error: Failed to decode JSON from LLM response.")
+            return 0  
+
+        except KeyError:
+            print("Error: 'specificity' key not found in JSON response.")
+            return 0  
         
     def determine_text_classification(self, cosine_similiarity, retrieved_text, prompt_text, threshold_score):
         find_similarity_llm = SYSTEM_PROMPT_SIMILIARITY.format(
