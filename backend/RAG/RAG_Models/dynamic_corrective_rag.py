@@ -1,13 +1,14 @@
 import os
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
-from '../llm' import chunk_text, retrieve_from_vstore, query_llm
-from prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY
+from llm import chunk_text, retrieve_from_vstore, query_llm
+from .prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY
 
 class CorrectiveRAG:
-    def __init__(self, generator_models, reasoning_models, chroma_collection, max_tokens=100, temperature=0.2):
+    def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.2):
         self.generator_models = generator_models
         self.reasoning_models = reasoning_models
-        self.chroma_collection = chroma_collection
         self.max_tokens = max_tokens
         self.temperature = temperature
         
@@ -20,7 +21,7 @@ class CorrectiveRAG:
         try:
             response_json = json.loads(response)
             S = response_json.get("specificity", 0)
-        except: json.JSONDecodeError:
+        except json.JSONDecodeError:
             S = 0
         
         threshold_score = 0.53 * (1 + (S / 10)) # Dynamic threshold based on empirical testing
@@ -31,14 +32,14 @@ class CorrectiveRAG:
             retrieved_text=retrieved_text,
             prompt_text=prompt_text
         )
-        response = query_llm(find_similiarity, max_tokens=10, temperature=0.0, model=self.reasoning_models[2])
+        response = query_llm(find_similarity_llm, max_tokens=10, temperature=0.0, model=self.reasoning_models[2])
         try:
             response_json = json.loads(response)
             llm_similiarity = response_json.get("similarity", 0)
         except json.JSONDecodeError:
             llm_similiarity = 0
         
-        similairity_score = (llm_similiarity + cosine_similiarity) / 2
+        similairity_score = (llm_similiarity + abs(cosine_similiarity)) / 2
         if(similairity_score >= threshold_score):
             return 'related'
         elif(similairity_score <= threshold_score and similairity_score > 0.2):
@@ -77,9 +78,10 @@ class CorrectiveRAG:
         
     
     def knowledge_refinement(self, chunk, semi_related_docs):
+        return "Refined knowledge"
         
     def knowledge_search(self, chunk):
-        
+        return "Searched knowledge"
 
     def generate_explanation(self, results):
         explanations = []
@@ -125,3 +127,6 @@ class CorrectiveRAG:
             })
         
         return explanations
+    
+    def testing():
+        return "testing works"

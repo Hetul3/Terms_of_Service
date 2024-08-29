@@ -3,12 +3,13 @@ import csv
 import json
 from collections import defaultdict
 import chromadb
+from dotenv import load_dotenv
 from chromadb.config import Settings
 from chromadb import Client
 from app.config import Config
 from .preprocessing import combine_csv
 
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../vector_store')
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../terms_vector_store')
 collection_name = Config.COLLECTION_NAME
 
 def create_vstore():
@@ -45,4 +46,3 @@ def create_vstore():
         return f"Vectordb successfully stored"
     else:
         return f"Failed to store vectordb"
-    

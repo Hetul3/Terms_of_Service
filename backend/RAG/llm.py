@@ -8,10 +8,12 @@ from chromadb.config import Settings
 from chromadb import Client
 
 groq_key = Config.GROQ_KEY
-db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../vector_store')
+db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../terms_vector_store')
 collection_name = Config.COLLECTION_NAME
+# collection_name = "terms_and_conditions_classification_collection"
 
 chroma_client = chromadb.PersistentClient(path=db_path)
+# print(chroma_client.list_collections())
 collection = chroma_client.get_collection(name=collection_name)
 
 # we will be using larger models for the generation and smaller models/specialized models for reasoning
@@ -66,7 +68,6 @@ def retrieve_from_vstore(text, including_data, n_results=3):
         n_results=n_results,
         include=including_data
     )
-    print(results)
     return results
 
 def pair_chunks_with_results(chunks, n_results=3):
@@ -91,16 +92,13 @@ def pair_chunks_with_results(chunks, n_results=3):
         }
     return result_dict
         
+        
+if __name__ == "__main__":
+    print("test")
+    results = retrieve_from_vstore("contract law", ['metadatas', 'documents', 'distances'])
+    print(results)
+    
 
 def handle_text_contract(text):
     chunks = chunk_text(text)
     chunk_retrieval_results = pair_chunks_with_results(chunks)
-    
-    
-    
-examplar_text = "This is a sample text. It should be chunked properly based on the limits of the hard and soft limits. For example, it should be able to handle run on sentences like this, with a hard stop, so we are just going to keep going and and not stop for a bit longer, anyway how's your day been going, oops I almost ended that with a question mark, good thing I caught myself, time to copy and paste, to copy and paste, to copy and paste, to copy and paste, to copy and paste, to copy and paste. That should be enough, check if out, it can also handle question marks?"
-        
-if __name__ == '__main__':
-    chunks = chunk_text(examplar_text)
-    print(chunks)
-    pair_chunks_with_results(chunks)
