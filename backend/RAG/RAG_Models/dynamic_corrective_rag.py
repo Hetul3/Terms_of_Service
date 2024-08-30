@@ -6,7 +6,7 @@ from llm import chunk_text, retrieve_from_vstore, query_llm
 from .prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY
 
 class CorrectiveRAG:
-    def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.2):
+    def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.3):
         self.generator_models = generator_models
         self.reasoning_models = reasoning_models
         self.max_tokens = max_tokens
@@ -39,7 +39,8 @@ class CorrectiveRAG:
             retrieved_text=retrieved_text,
             prompt_text=prompt_text
         )
-        response = query_llm(find_similarity_llm, max_tokens=10, temperature=0.0, model=self.reasoning_models[2])
+        response = query_llm(find_similarity_llm, max_tokens=15, temperature=0.0, model=self.reasoning_models[2])
+        print("Raw LLM Response:", response)
         try:
             response_json = json.loads(response)
             llm_similiarity = response_json.get("similarity", 0)
@@ -48,92 +49,112 @@ class CorrectiveRAG:
         
         similairity_score = (llm_similiarity + abs(cosine_similiarity)) / 2
         if(similairity_score >= threshold_score):
-            return 'related'
+            return 'related', similairity_score
         elif(similairity_score <= threshold_score and similairity_score > 0.2):
-            return 'semi-related'
+            return 'semi-related', similairity_score
         else:
-            return 'unrelated'
+            return 'unrelated', similairity_score
         
-        
-    def classify_retrieved_text(self, chunk, retrieved_data, classifications, cosine_similiarity):
-        threshold_score = self.classify_prompt_text(chunk)
-        classification = self.determine_text_classification(cosine_similiarity, retrieved_data, chunk, threshold_score)
-        return classification
     
     def process_text(self, text):
         chunks = chunk_text(text)
         all_results = []
+        threshold_score = self.classify_prompt_text(text)
         
         for chunk in chunks:
             retrieval_results = retrieve_from_vstore(chunk, ['metadatas', 'documents', 'distances'])
             
-            for doc, meta, dist in zip(retrieval_results['documents'],
-                                       retrieval_results['metadatas'],
-                                       retrieval_results['distances']):
-                retrieved_classifications = meta.get('classifications', '[]')
-                classification = self.classify_retrieved_text(chunk, doc, retrieved_classifications, dist)
+            for doc, meta, dist in zip(retrieval_results['documents'][0],
+                                       retrieval_results['metadatas'][0],
+                                       retrieval_results['distances'][0]):
+                classifications_string = meta.get('classifications', '[]')
+                retrieved_classifications = json.loads(classifications_string)
+                classification, similarity_score = self.determine_text_classification(dist, doc, chunk, threshold_score)
                 all_results.append({
                     'chunk': chunk,
                     'document': doc,
                     'relation': classification,
                     'classification': retrieved_classifications,
                     'refinement': None,
-                    'distance': dist,
+                    'distance': similarity_score,
                 })
                 
-            return all_results
+        return all_results
         
-    
+    def process_result_object(self, all_results):
+        result_map = {}
+        
+        for result in all_results:
+            chunk = result['chunk']
+            
+            if chunk not in result_map:
+                result_map[chunk] = []
+            
+            result_map[chunk].append({
+                'document': result['document'],
+                'relation': result['relation'],
+                'classification': result['classification'],
+                'refinement': result['refinement'],
+                'distance': result['distance'],
+            })
+        
+        return result_map
+        
     def knowledge_refinement(self, chunk, semi_related_docs):
         return "Refined knowledge"
         
     def knowledge_search(self, chunk):
         return "Searched knowledge"
-
-    def generate_explanation(self, results):
-        explanations = []
-        chunks_grouped = {}
-        
-        for result in results:
-            chunk = result['chunk']
-            if chunk not in chunks_grouped:
-                chunks_grouped[chunk] = {'related': [], 'semi-related': [], 'unrelated': [], 'unclassified': []} 
-                
-            chunks_grouped[chunk][result['relation']].append({
-                'document': result['document'],
-                'classification': resukt['classification'],
-                'relation': result['relation'],
-            })
-            
-        for chunk, docs_group in chunks_grouped.items():
-            if doc_group['related']:
-                related_docs = docs_group['related']
+    
+    
+    def generate_explanations(self, result_map):
+        explanations = {}
+        for chunk, results in result_map.items():
+            related_docs = []
+            semi_related_docs = []
+            unrelated_docs = []
+            for result in results:
+                if result['relation'] == 'related':
+                    related_docs.append({
+                        'document': result['document'],
+                        'classification': result['classification'],
+                    })
+                elif result['relation'] == 'semi-related':
+                    semi_related_docs.append({
+                        'document': result['document'],
+                        'classification': result['classification'],
+                    })
+                else:
+                    unrelated_docs.append({
+                        'document': result['document'],
+                        'classification': result['classification'],
+                    })
+                    
+            if related_docs:
+                related_docs_str = json.dumps(related_docs)
                 prompt = SYSTEM_PROMPT_GENERATION.format(
                     chunk=chunk,
-                    related_docs=related_docs
+                    related_docs=related_docs_str
                 )
-                explanation = query_llm(prompt, max_tokens=25, temperature=self.temperature, model=self.generator_models[0])
+                print("System prompt: ", prompt)
+                response = query_llm(prompt, max_tokens=75, temperature=self.temperature, model=self.generator_models[0])
                 try:
-                    response_json = json.loads(explanation)
+                    response_json = json.loads(response.strip())
                     explanation = response_json.get("explanation", "Introductory/Generic")
+                    classification = response_json.get("classification", "Introductory/Generic")
                 except json.JSONDecodeError:
+                    print("Error: Failed to decode JSON from LLM response. Fallback to default explanation.")
                     explanation = "Introductory/Generic"
-                    
-            elif docs_group['semi-related']:
-                explanation = self.knowledge_refinement(chunk, docs_group['semi-related'])
+                    classification = "Introductory/Generic"
             
-            elif all(not docs for relation, docs in docs_group.items() if relation != 'unrelated' and relation != 'unclassified'):
+            elif semi_related_docs:
+                explanation = self.knowledge_refinement(chunk, semi_related_docs)    
+            else:
                 explanation = self.knowledge_search(chunk)
             
-            else:
-                continue
-            
-            explanations.append({
-                'chunk': chunk,
+            explanations[chunk] = {
                 'explanation': explanation.strip(),
-            })
-        
-        return explanations
-    
-    def testing():
-        return "testing works"
+                'classification': classification.strip()
+            }
+            
+        return explanations           

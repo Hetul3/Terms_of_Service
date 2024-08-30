@@ -6,6 +6,7 @@ from collections import defaultdict
 import chromadb
 from chromadb.config import Settings
 from chromadb import Client
+from RAG_Models.dynamic_corrective_rag import CorrectiveRAG
 
 groq_key = Config.GROQ_KEY
 db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../terms_vector_store')
