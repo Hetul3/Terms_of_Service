@@ -101,5 +101,6 @@ if __name__ == "__main__":
     
 
 def handle_text_contract(text):
-    chunks = chunk_text(text)
-    chunk_retrieval_results = pair_chunks_with_results(chunks)
+    chunks = CorrectiveRAG.process_text(text)
+    result_map = CorrectiveRAG.process_result_object(chunks)
+    explanations = CorrectiveRAG.generate_explanations(result_map)
