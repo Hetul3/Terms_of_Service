@@ -153,6 +153,9 @@ class CorrectiveRAG:
     def generate_explanations(self, result_map):
         explanations = {}
         for chunk, results in result_map.items():
+            if chunk not in explanations:
+                explanations[chunk] = {}
+            
             related_docs = []
             semi_related_docs = []
             unrelated_docs = []
@@ -197,7 +200,7 @@ class CorrectiveRAG:
                 explanation, classification = self.knowledge_refinement(chunk)    
             else:
                 explanation, classification = self.knowledge_search(chunk)
-            
+                
             explanations[chunk] = {
                 'explanation': explanation.strip(),
                 'classification': classification.strip()
