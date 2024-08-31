@@ -5,7 +5,7 @@ import os
 import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from RAG.RAG_Models.dynamic_corrective_rag import CorrectiveRAG
-from RAG.llm import retrieve_from_vstore, query_llm, chunk_text
+from RAG.utils import retrieve_from_vstore, query_llm, chunk_text
 
 @pytest.fixture
 def corrective_rag(generator_models, reasoning_models):
@@ -117,3 +117,8 @@ def test_generate_explanations(corrective_rag):
     # since the outputs can be variable, if it outputs anything without erorr then the test passes
     assert True
     
+def test_knowledge_refinement(corrective_rag):
+    chunk = "Netflix grants You a limited, non-exclusive, revocable, non-sublicensable and non-transferable license to display the Netflix Brand Assets in accordance with these Terms."
+    print("knowledge refinement: ", corrective_rag.knowledge_refinement(chunk))
+    # since the outputs can be variable, if it outputs anything without erorr then the test passes
+    assert True

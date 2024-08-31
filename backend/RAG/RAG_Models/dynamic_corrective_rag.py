@@ -2,8 +2,8 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
-from llm import chunk_text, retrieve_from_vstore, query_llm
-from .prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY
+from utils import chunk_text, retrieve_from_vstore, query_llm
+from .prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY, SYSTEM_PROMPT_REPHRASE
 
 class CorrectiveRAG:
     def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.3):
@@ -100,11 +100,54 @@ class CorrectiveRAG:
         
         return result_map
         
-    def knowledge_refinement(self, chunk, semi_related_docs):
-        return "Refined knowledge"
+    def knowledge_refinement(self, chunk):
+        prompt = SYSTEM_PROMPT_REPHRASE.format(
+            chunk=chunk
+        )
+        response = query_llm(prompt, max_tokens=75, temperature=self.temperature, model=self.generator_models[1])
+        print("Raw LLM Response:", response)
+        try:
+            response_json = json.loads(response.strip())
+            rephrased_chunk = response_json.get("rephrased_chunk", chunk)
+        except json.JSONDecodeError:
+            print("Error: Failed to decode JSON from LLM response. Fallback to default chunk.")
+            rephrased_chunk = chunk
+        
+        print("Rephrased chunk: ", rephrased_chunk)
+
+        retrieval_results = retrieve_from_vstore(rephrased_chunk, ['documents', 'metadatas'], n_results=2)
+        retrieval_results_arr = []
+        for doc, meta in zip(retrieval_results['documents'][0], retrieval_results['metadatas'][0]):
+            classifications_string = meta.get('classifications', '[]')
+            retrieved_classifications = json.loads(classifications_string)
+            retrieval_results_arr.append({
+                'document': doc,
+                'classification': retrieved_classifications,
+            })
+        
+        retrieval_text = str(retrieval_results_arr)
+        print("Retrieval text: ", retrieval_text)
+        prompt = SYSTEM_PROMPT_GENERATION.format(
+            chunk=rephrased_chunk,
+            related_docs=retrieval_text
+        )
+        print("System prompt (ambigious): ", prompt)
+        response = query_llm(prompt, max_tokens=75, temperature=self.temperature, model=self.generator_models[0])
+        print("Raw LLM Response Generation:", response)
+        try:
+            response_json = json.loads(response.strip())
+            explanation = response_json.get("explanation", "Introductory/Generic")
+            classification = response_json.get("classification", "Introductory/Generic")
+        except json.JSONDecodeError:
+            print("Error: Failed to decode JSON from LLM response. Fallback to default explanation.")
+            explanation = "Introductory/Generic"
+            classification = "Introductory/Generic"
+        
+        return explanation, classification
         
     def knowledge_search(self, chunk):
-        return "Searched knowledge"
+        # TODO: Implement web search/scraping for a legal knowledge base
+        return "???", "???"
     
     
     def generate_explanations(self, result_map):
@@ -130,6 +173,9 @@ class CorrectiveRAG:
                         'classification': result['classification'],
                     })
                     
+            explanation="Introductory/Generic"
+            classification="Introductory/Generic"
+                
             if related_docs:
                 related_docs_str = json.dumps(related_docs)
                 prompt = SYSTEM_PROMPT_GENERATION.format(
@@ -148,9 +194,9 @@ class CorrectiveRAG:
                     classification = "Introductory/Generic"
             
             elif semi_related_docs:
-                explanation = self.knowledge_refinement(chunk, semi_related_docs)    
+                explanation, classification = self.knowledge_refinement(chunk)    
             else:
-                explanation = self.knowledge_search(chunk)
+                explanation, classification = self.knowledge_search(chunk)
             
             explanations[chunk] = {
                 'explanation': explanation.strip(),
