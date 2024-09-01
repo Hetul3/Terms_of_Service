@@ -40,9 +40,9 @@ class BaseRAG:
                 explanation = "Introductory/Generic"
                 classification = "Introductory/Generic"
             
-            explanations[chunk].append({
+            explanations[chunk] = {
                 'explanation': explanation,
                 'classification': classification,
-            })
+            }
             
         return explanations
