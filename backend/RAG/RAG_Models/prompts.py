@@ -69,7 +69,7 @@ Chunk to analyze: "{chunk}"
 Related document: "{related_doc}"
 Classifications: {classifications}
 
-The classification is known to be related to the related document, use this knowledge to come up with a layperson explanation of the chunk and how it could be a redflag just like how the related document could be a redflag. 
+The classification is known to be related to the related document, use this knowledge to come up with a layperson explanation of the chunk in under 30 tokens and how it could be a redflag just like how the related document could be a redflag. 
 Also output the classification you best believe fits the chunk out of the list of classifications shown. If the chunk is not a redflag, output "Introductory/Generic" for both the explanation and classification.
 Output your response as a JSON object:
 {{

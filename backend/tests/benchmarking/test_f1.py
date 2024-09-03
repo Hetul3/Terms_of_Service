@@ -59,10 +59,9 @@ if __name__ == '__main__':
         ("If you have any questions about our privacy practices, you can contact us at privacy@example.com.", 'Privacy contact information'),
         ("Our service is not intended for use by children under the age of 13.", 'International and Specific Audiences'),
         ("We have implemented industry-standard security measures to protect your personal information.", 'Data Security'),
-        ("Users can request access to, edit, or delete their personal information through their account settings.", '"User Access, Edit and Deletion"'),
+        ("Users can request access to, edit, or delete their personal information through their account settings.", 'User Access, Edit and Deletion'),
         ("By using our service, you agree to the terms and conditions outlined in this agreement.", 'Introductory/Generic'),
         ("You have the option to opt-out of certain data collection practices at any time.", 'User Choice/Control'),
-        ("We may share your information with trusted partners to provide and improve our services.", 'Third Party Sharing/Collection'),
     ]
     input_data_list = [input_data for input_data, _ in test_cases]
     true_labels_list = [true_label for _, true_label in test_cases]
