@@ -63,19 +63,19 @@ if __name__ == '__main__':
         "The service provider may collect your location data to improve your experience, but they may also use this information for other purposes like targeted ads."),
         
         ("By using our service, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and distribute your user-generated content.",
-        "When you use the service and create content, you're giving the company permission to use and share your content for free, anywhere in the world. Be aware that you might lose some control over how your content is used."),
+        "This service can use and share you content worldwide without paying you, which may raise concerns about ownership and compensation."),
         
         ("We reserve the right to terminate your account at any time for any reason without notice.",
-        "The company can shut down your account at any time without telling you why. This could be problematic if you rely on the service, as you might suddenly lose access to your data or the service."),
+        "The company has the power to end you account without notice or explanation, which could ead to loss of access and data."),
         
         ("Your personal information may be shared with our affiliates and partners for marketing purposes.",
-        "The company might share your personal data with other companies for advertising. This could lead to more targeted ads and potentially more spam in your inbox."),
+        "Your data may be used for targeted ads, potentially without your direct consent, and shared with unknown third parties."),
         
         ("We may modify these terms at any time, and your continued use of the service constitutes acceptance of the changes.",
-        "The company can change the rules anytime, and if you keep using the service, it means you agree to the new rules. This could be risky because terms might change in ways you don't like without you realizing it."),
+        "This means the compnay can change its rules without your explicit consent, and contued use implies agreement to new terms."),
         
         ("In the event of a dispute, you agree to resolve the issue through binding arbitration rather than in court.",
-        "If you have a problem with the company, you agree to settle it through arbitration instead of going to court. This might limit your legal options and could be less favorable to you than a court proceeding."),
+        "You may be giving up your right to a court trial if a dispute arises, and instead, a neutral third party will make a decision."),
         
         ("We use cookies and similar technologies to track your activity on our site and other sites.",
         "The company uses technologies to monitor what you do on their site and potentially on other websites too. This extensive tracking could raise privacy concerns."),
@@ -87,7 +87,13 @@ if __name__ == '__main__':
         "The company might use your name and picture for ads or sponsored posts. This could mean your identity is used to promote products or services without your explicit consent for each use."),
         
         ("By submitting ideas or feedback, you grant us the right to use them without compensation or attribution.",
-        "If you give the company ideas or feedback, they can use them for free without giving you credit or payment. This means you could potentially lose out on valuable ideas you share.")
+        "If you give the company ideas or feedback, they can use them for free without giving you credit or payment. This means you could potentially lose out on valuable ideas you share."),
+        
+        ("All of Your uses of the Netflix Brand Assets in any of Your marketing, advertising, content, or other material (""Your Materials"") are subject to Netflix's approval prior to use.",
+         "You must ask permission and get the consent of Netflix before using any of their assets and branding in your marketing or content. This could limit your creative freedom and require extra steps before you can use their materials."),
+        
+        ("You acknowledge and agree to provide public-facing contact information, a refund policy and order fulfilment timelines on your Shopify Store.", 
+         "This company requires you to share your contact details and refund policy on your Shopify store."),
     ]
     F1_corrective, F1_rag = benchmark_models(test_cases)
     print('F1 Score for Corrective RAG: ', F1_corrective)
