@@ -1,26 +1,22 @@
 import React, { useState, FormEvent } from 'react';
-import { submitText } from '../api/api';
 
-const TextInput: React.FC = () => {
+interface TextInputProps {
+  onSubmit: (event: FormEvent, text: string) => void;
+}
+
+const TextInput: React.FC<TextInputProps> = ({ onSubmit }) => {
   const [text, setText] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleSubmitText = (event: FormEvent) => {
-    event.preventDefault();
-    if (text === null || text.trim() === "") {
-      alert("Please enter longer text");
-      return;
-    }
-    submitText(text)
-      .then(data => {
-        console.log(data);
-      })
-      .catch(error => console.error(error));
-  }
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault(); 
+    onSubmit(e, text); 
+  };
+
 
   return (
     <div className="w-full mx-auto mt-2 mb-2">
@@ -47,7 +43,7 @@ const TextInput: React.FC = () => {
       </button>
       
       <div className={`mt-4 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
-        <form onSubmit={handleSubmitText} className="w-full bg-white rounded-lg shadow-lg p-6">
+        <form onSubmit={handleFormSubmit} className="w-full bg-white rounded-lg shadow-lg p-6">
             <div className="grid gap-2 px-4">
               <textarea
                 value={text}

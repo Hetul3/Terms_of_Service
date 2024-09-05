@@ -25,9 +25,9 @@ def process_text_contract():
     try:
         data = request.get_json()
         text = data.get('text')
-        processed_response = handle_text_contract(text)
+        processed_response, chunked_array = handle_text_contract(text)
         # handle how to process the text contract and send back response in reasonable manner
-        response = Response(json.dunps({'response': processed_response}), status=200, mimetype='application/json')
+        response = Response(json.dumps({'response': processed_response, 'order': chunked_array}), status=200, mimetype='application/json')
         return response
     except Exception as e:
         current_app.logger.error(f"Error processing text contract: {e}")

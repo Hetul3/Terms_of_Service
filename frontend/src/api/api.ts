@@ -1,7 +1,7 @@
-const API_BASE_URL: string = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+const API_BASE_URL: string = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
 
 export async function queryLlm(query: string) {
-    const response = await fetch('http://localhost:8080/rag/query_llm', {
+    const response = await fetch(`${API_BASE_URL}/rag/query_llm`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -19,7 +19,7 @@ export async function uploadImage(file: File) {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch('http://localhost:8080/rag/process_image_test', {
+    const response = await fetch(`${API_BASE_URL}/rag/process_image_test`, {
         method: 'POST',
         body: formData
     });
@@ -37,7 +37,7 @@ export async function uploadImage(file: File) {
 }
 
 export async function submitUrl(url: string) {
-    const response = await fetch('http://localhost:8080/rag/process_url_contract', {
+    const response = await fetch(`${API_BASE_URL}/rag/process_url_contract`, {
         method: 'POST', 
         headers: {
             'Content-Type': 'application/json'
@@ -52,7 +52,7 @@ export async function submitUrl(url: string) {
 }
 
 export async function submitText(text: string) {
-    const response = await fetch('http://localhost:8080/rag/process_text_contract', {
+    const response = await fetch(`${API_BASE_URL}/rag/process_text_contract`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

@@ -1,27 +1,21 @@
 import React, { useState, FormEvent } from 'react';
-import { submitUrl } from '../api/api';
 
-const UrlInput: React.FC = () => {
+interface UrlInputProps {
+  onSubmit: (event: FormEvent, url: string) => void;
+}
+
+const UrlInput: React.FC<UrlInputProps> = ({ onSubmit }) => {
   const [url, setUrl] = useState<string>("");
   const [isOpen, setIsOpen] = useState(false);
-
-  const handleUrlSubmit = (event: FormEvent) => {
-    event.preventDefault();
-    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
-    if (!urlRegex.test(url)) {
-      alert("Please enter a valid URL");
-      return;
-    }
-    submitUrl(url)
-      .then(data => {
-        console.log(data);
-      })
-      .catch(error => console.error(error));
-  }
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
   };
+
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault(); 
+    onSubmit(e, url); 
+  }
 
   return (
     <div className="w-full mx-auto mt-2 mb-2">
@@ -44,7 +38,7 @@ const UrlInput: React.FC = () => {
       </button>
       
       <div className={`mt-4 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
-        <form onSubmit={handleUrlSubmit} className="w-full bg-white rounded-lg shadow-lg p-6">
+        <form onSubmit={handleFormSubmit} className="w-full bg-white rounded-lg shadow-lg p-6">
             <div className="grid gap-2 px-4">
               <input
                 type="url"

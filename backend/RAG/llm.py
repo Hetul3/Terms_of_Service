@@ -1,5 +1,5 @@
-from utils import chunk_text, retrieve_from_vstore, query_llm, generatorModels, reasoningModels
-from RAG_Models.dynamic_corrective_rag import CorrectiveRAG
+from RAG.utils import chunk_text, retrieve_from_vstore, query_llm, generatorModels, reasoningModels
+from .RAG_Models.dynamic_corrective_rag import CorrectiveRAG
 
 def pair_chunks_with_results(chunks, n_results=3):
     result_dict = {}
@@ -28,7 +28,9 @@ def handle_text_contract(text):
     chunks = corrective_rag.process_text(text)
     result_map = corrective_rag.process_result_object(chunks)
     explanations = corrective_rag.generate_explanations(result_map)
-    return explanations
+    
+    chunk_array = chunk_text(text)
+    return explanations, chunk_array
 
 if __name__ == "__main__":
     print("test")

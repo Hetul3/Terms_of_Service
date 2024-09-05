@@ -1,14 +1,45 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FormEvent } from 'react';
 import ImageInput from '../components/ImageInput';
 import TextInput from '../components/TextInput';
 import UrlInput from '../components/UrlInput';
 import ResponseOutput from '../components/ResponseOutput';
+import {submitUrl, submitText} from '../api/api';
 
 const Home: React.FC = () => {
-  const [headerVisible1, setHeaderVisible1] = useState(false);
-  const [headerVisible2, setHeaderVisible2] = useState(false);
-  const [description, setDescription] = useState("");
+  const [headerVisible1, setHeaderVisible1] = useState<boolean>(false);
+  const [headerVisible2, setHeaderVisible2] = useState<boolean>(false);
+  const [description, setDescription] = useState<string>("");
+  const [output, setOutput] = useState<any>(null);
   const fullDescription = "Select how you want to paste your terms and conditions. Our advanced AI-powered system will analyze the document for potential issues and inconsistencies!";
+
+  const handleSubmitText = (event: FormEvent, text: string) => {
+    event.preventDefault();
+    if (text === null || text.trim() === "") {
+      alert("Please enter longer text");
+      return;
+    }
+    submitText(text)
+      .then(data => {
+        console.log(data);
+        setOutput(data);
+      })
+      .catch(error => console.error(error));
+  }
+
+  const handleUrlSubmit = (event: FormEvent, url: string) => {
+    event.preventDefault();
+    const urlRegex = /^(ftp|http|https):\/\/[^ "]+$/;
+    if (!urlRegex.test(url)) {
+      alert("Please enter a valid URL");
+      return;
+    }
+    submitUrl(url)
+      .then(data => {
+        console.log(data);
+        setOutput(data);
+      })
+      .catch(error => console.error(error));
+  }
 
   useEffect(() => {
     const headerTimeout1 = setTimeout(() => setHeaderVisible1(true), 500);
@@ -53,10 +84,10 @@ const Home: React.FC = () => {
           <p>{description}</p>
         </div>
         <div className="mt-8">
-          <TextInput />
-          <UrlInput />
+          <TextInput onSubmit={handleSubmitText}/>
+          <UrlInput onSubmit={handleUrlSubmit}/>
           <ImageInput />
-          <ResponseOutput />
+          <ResponseOutput response={output}/>
         </div>
       </div>
     </div>
