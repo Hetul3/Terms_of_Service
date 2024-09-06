@@ -19,7 +19,7 @@ export async function uploadImage(file: File) {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_BASE_URL}/rag/process_image_test`, {
+    const response = await fetch(`${API_BASE_URL}/rag/process_image_contract`, {
         method: 'POST',
         body: formData
     });

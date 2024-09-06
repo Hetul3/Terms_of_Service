@@ -3,7 +3,7 @@ import ImageInput from '../components/ImageInput';
 import TextInput from '../components/TextInput';
 import UrlInput from '../components/UrlInput';
 import ResponseOutput from '../components/ResponseOutput';
-import {submitUrl, submitText} from '../api/api';
+import {submitUrl, submitText, uploadImage} from '../api/api';
 
 const Home: React.FC = () => {
   const [headerVisible1, setHeaderVisible1] = useState<boolean>(false);
@@ -34,6 +34,17 @@ const Home: React.FC = () => {
       return;
     }
     submitUrl(url)
+      .then(data => {
+        console.log(data);
+        setOutput(data);
+      })
+      .catch(error => console.error(error));
+  }
+
+  const handleImageSubmit = (event: FormEvent, file: File) => {
+    event.preventDefault();
+    if (!file) return;
+    uploadImage(file)
       .then(data => {
         console.log(data);
         setOutput(data);
@@ -86,7 +97,7 @@ const Home: React.FC = () => {
         <div className="mt-8">
           <TextInput onSubmit={handleSubmitText}/>
           <UrlInput onSubmit={handleUrlSubmit}/>
-          <ImageInput />
+          <ImageInput onSubmit={handleImageSubmit} />
           <ResponseOutput response={output}/>
         </div>
       </div>

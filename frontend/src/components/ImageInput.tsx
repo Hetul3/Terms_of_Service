@@ -1,7 +1,11 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { uploadImage } from '../api/api';
 
-const ImageInput: React.FC = () => {
+interface ImageInputProps {
+  onSubmit: (event: FormEvent, file: File) => void;
+}
+
+const ImageInput: React.FC<ImageInputProps> = ({ onSubmit }) => {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -33,18 +37,14 @@ const ImageInput: React.FC = () => {
     setPreview(null);
   };
 
-  const handleSubmit = async (event: FormEvent) => {
-    event.preventDefault();
+
+  const handleFormSubmit = (e: FormEvent) => {
+    e.preventDefault();
     if (!file) return;
-    try {
-      const data = await uploadImage(file);
-      console.log("extracted text: ", data);
-      setFile(null);
-      setPreview(null);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+    onSubmit(e, file);
+    setFile(null);
+    setPreview(null);
+  }
 
   const toggleAccordion = () => {
     setIsOpen(!isOpen);
@@ -75,7 +75,7 @@ const ImageInput: React.FC = () => {
       </button>
       
       <div className={`mt-4 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96' : 'max-h-0'}`}>
-        <form onSubmit={handleSubmit} className="w-full bg-white rounded-lg shadow-lg p-6">
+        <form onSubmit={handleFormSubmit} className="w-full bg-white rounded-lg shadow-lg p-6">
           {!file ? (
             <div className="w-full py-9 bg-gray-50 rounded-2xl border border-gray-300 gap-3 grid border-dashed">
               <div className="grid gap-1">
