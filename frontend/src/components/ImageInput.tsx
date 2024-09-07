@@ -1,5 +1,4 @@
 import React, { useState, ChangeEvent, FormEvent } from 'react';
-import { uploadImage } from '../api/api';
 
 interface ImageInputProps {
   onSubmit: (event: FormEvent, file: File) => void;

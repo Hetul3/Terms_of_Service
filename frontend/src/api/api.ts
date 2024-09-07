@@ -65,3 +65,26 @@ export async function submitText(text: string) {
     }
     return response.json();
 }
+
+export async function submitFeedback(feedback_type: boolean, classification: string, explanation: string, phrase: string) {
+    const data = {
+        "feedback_time": new Date().toISOString(),
+        "feedback_type": feedback_type,
+        "classification": classification,
+        "explanation": explanation,
+        "phrase": phrase
+    }
+
+    const response = await fetch(`${API_BASE_URL}/feedback/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+
+    if(!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+}

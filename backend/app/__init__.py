@@ -9,8 +9,9 @@ def create_app():
     
     app.config.from_object(Config)
     
-    from .routes import vector_store_bp, rag_bp
+    from .routes import vector_store_bp, rag_bp, feedback_bp
     app.register_blueprint(vector_store_bp, url_prefix='/vector_store')
     app.register_blueprint(rag_bp, url_prefix='/rag')
+    app.register_blueprint(feedback_bp, url_prefix='/feedback')
     
     return app
