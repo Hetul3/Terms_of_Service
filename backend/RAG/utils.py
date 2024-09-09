@@ -49,8 +49,10 @@ def chunk_text(text, min_chunk_length=150, max_chunk_length=450):
         
     return chunks
 
-def retrieve_from_vstore(text, including_data, n_results=3):
-    results = collection.query(
+def retrieve_from_vstore(text, including_data, n_results=3, collection=collection_name):
+    client_collection = chroma_client.get_collection(name=collection)
+    
+    results = client_collection.query(
         query_texts=[text],
         n_results=n_results,
         include=including_data

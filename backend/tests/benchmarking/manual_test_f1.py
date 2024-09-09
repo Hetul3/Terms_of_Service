@@ -7,6 +7,7 @@ from RAG.RAG_Models.dynamic_corrective_rag import CorrectiveRAG
 from RAG.RAG_Models.rag import BaseRAG
 from RAG.utils import retrieve_from_vstore, query_llm, chunk_text
 from sklearn.metrics import precision_recall_fscore_support
+from .manual_test_cases.testcases import TEST_CASES_CLASSIFICATION
 
 def run_corrective_rag(input_data):
     model = CorrectiveRAG(generator_models=['llama-3.1-70b-versatile', 'llama3-70b-8192', 'llama3-groq-70b-8192-tool-use-preview'], reasoning_models=['llama-3.1-8b-instant', 'llama3-8b-8192', 'mixtral-8x7b-32768', 'gemma2-9b-it'])
@@ -53,18 +54,8 @@ def benchmark_models(input_data, true_labels):
     return f1_corrective, f1_rag
     
 if __name__ == '__main__':
-    test_cases = [
-        ("We may collect information about your location and device usage to enhance your experience.", 'First Party Collection/Use'),
-        ("Your data will be retained for as long as necessary to provide you with our services.", 'Data Retention'),
-        ("If you have any questions about our privacy practices, you can contact us at privacy@example.com.", 'Privacy contact information'),
-        ("Our service is not intended for use by children under the age of 13.", 'International and Specific Audiences'),
-        ("We have implemented industry-standard security measures to protect your personal information.", 'Data Security'),
-        ("Users can request access to, edit, or delete their personal information through their account settings.", 'User Access, Edit and Deletion'),
-        ("By using our service, you agree to the terms and conditions outlined in this agreement.", 'Introductory/Generic'),
-        ("You have the option to opt-out of certain data collection practices at any time.", 'User Choice/Control'),
-    ]
-    input_data_list = [input_data for input_data, _ in test_cases]
-    true_labels_list = [true_label for _, true_label in test_cases]
+    input_data_list = [input_data for input_data, _ in TEST_CASES_CLASSIFICATION]
+    true_labels_list = [true_label for _, true_label in TEST_CASES_CLASSIFICATION]
     
     f1_corrective_scores = []
     f1_rag_scores = []

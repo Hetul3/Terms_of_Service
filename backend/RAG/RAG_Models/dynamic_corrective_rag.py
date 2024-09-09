@@ -2,15 +2,17 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import json
+from app.config import Config
 from utils import chunk_text, retrieve_from_vstore, query_llm
 from .prompts import SYSTEM_PROMPT_GENERATION, SYSTEM_PROMPT_SPECIFICITY, SYSTEM_PROMPT_SIMILIARITY, SYSTEM_PROMPT_REPHRASE
 
 class CorrectiveRAG:
-    def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.3):
+    def __init__(self, generator_models, reasoning_models, max_tokens=100, temperature=0.3, collection_name=Config.COLLECTION_NAME):
         self.generator_models = generator_models
         self.reasoning_models = reasoning_models
         self.max_tokens = max_tokens
         self.temperature = temperature
+        self.collection_name = collection_name
         
         
     def classify_prompt_text(self, prompt_text):
@@ -62,7 +64,7 @@ class CorrectiveRAG:
         threshold_score = self.classify_prompt_text(text)
         
         for chunk in chunks:
-            retrieval_results = retrieve_from_vstore(chunk, ['metadatas', 'documents', 'distances'])
+            retrieval_results = retrieve_from_vstore(chunk, ['metadatas', 'documents', 'distances'], collection=self.collection_name)
             
             for doc, meta, dist in zip(retrieval_results['documents'][0],
                                        retrieval_results['metadatas'][0],
@@ -115,7 +117,7 @@ class CorrectiveRAG:
         
         print("Rephrased chunk: ", rephrased_chunk)
 
-        retrieval_results = retrieve_from_vstore(rephrased_chunk, ['documents', 'metadatas'], n_results=2)
+        retrieval_results = retrieve_from_vstore(rephrased_chunk, ['documents', 'metadatas'], n_results=2, collection=self.collection_name)
         retrieval_results_arr = []
         for doc, meta in zip(retrieval_results['documents'][0], retrieval_results['metadatas'][0]):
             classifications_string = meta.get('classifications', '[]')
@@ -147,7 +149,7 @@ class CorrectiveRAG:
         
     def knowledge_search(self, chunk):
         # TODO: Implement web search/scraping for a legal knowledge base
-        return "???", "???"
+        return "Introductory/Generic", "Introductory/Generic"
     
     
     def generate_explanations(self, result_map):
