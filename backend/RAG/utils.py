@@ -28,7 +28,7 @@ def query_llm(prompt, max_tokens=100, temperature=0.3, model='llama-3.1-70b-vers
     )
     return chat_completion.choices[0].message.content
 
-def chunk_text(text, min_chunk_length=150, max_chunk_length=450):
+def chunk_text(text, min_chunk_length=0, max_chunk_length=1000):
     chunks = []
     current_chunk = ""
     words = re.split(r'(\s+)', text)
